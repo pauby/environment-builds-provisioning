@@ -21,7 +21,7 @@ else {
         }
 
         if ($UseLocalSource.IsPresent) {
-            $cmd += " --source c:\packages"
+            $cmd += " --source local"
         }
 
         Write-Output "Installing Chocolatey package '$_' with command '$cmd'."

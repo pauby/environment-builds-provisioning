@@ -4,6 +4,9 @@ Param (
     $CleanupWindows10
 )
 
+# set TLS 1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072
+
 # Adapted from http://stackoverflow.com/a/29571064/18475
 # Get the OS
 $osData = Get-CimInstance -ClassName Win32_OperatingSystem
