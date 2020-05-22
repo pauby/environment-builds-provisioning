@@ -2,6 +2,37 @@ class prepare_windows {
 
   include set_windows_autologon
 
+  # Disable IE Security
+  ie_esc { 'IE ESC Configuration':
+    ensure => absent
+  }
+
+  # Stop and disable Windows Updates
+  service { 'wuauserv':
+    ensure => stopped,
+    enable => 'manual',
+  }
+
+  registry_key { 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU':
+    ensure => present
+  }
+
+  registry_value { 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\NoAutoUpdate':
+    ensure => present,
+    type   => dword,
+    data   => 1
+  }
+
+  # create Windows PowerShell profile
+  file { 'c:\users\vagrant\Documents\WindowsPowerShell':
+    ensure => directory
+  }
+
+  file { 'c:\users\vagrant\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1':
+    ensure  => file,
+    require => File['c:\users\vagrant\Documents\WindowsPowerShell'],
+  }
+
 # # Fix WinRM
 # # TODO this doesn't work from Puppet
 # #exec { 'WinRmMaxMemoryPerShell':
