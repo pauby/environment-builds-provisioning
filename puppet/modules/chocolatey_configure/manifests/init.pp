@@ -23,21 +23,22 @@ class chocolatey_configure {
     ensure => disabled,
   }
 
+  $windows_programdata = $facts['windows_env']['ALLUSERSPROFILE']
+  $chocolatey_cache_path = "${windows_programdata}/choco-cache"
+
   chocolateyconfig { 'cachelocation':
-    value  => "c:\\programdata\\choco-cache",
+    value  => $chocolatey_cache_path,
   }
 
   chocolateyconfig { 'commandExecutionTimeoutSeconds':
     value  => '14400',
   }
 
+  $windows_systemdrive = $facts['windows_env']['SYSTEMDRIVE']
+  $chocolatey_local_source_path = "${windows_systemdrive}/resources/packages"
   chocolateysource { 'local':
     ensure   => present,
-    location => 'c:\\resources\\packages',
-    priority => 1
-  }
-
-  chocolateysource { 'chocolatey':
-    ensure => disabled,
+    location => $chocolatey_local_source_path,
+    priority => 1,
   }
 }
