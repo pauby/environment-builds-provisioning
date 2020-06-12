@@ -12,6 +12,4 @@ class pauby_vagrant_provision::win_os_provision {
   include pauby_vagrant_provision::win_servermanager_disable
 
   include pauby_vagrant_provision::vm_tools_provision
-
-  include pauby_vagrant_provision::win_bginfo_provision
 }
