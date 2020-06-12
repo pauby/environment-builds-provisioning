@@ -1,14 +1,7 @@
-class set_windows_autologon {
-
-  #
-  # ConfigureAutoLogin
-  #
-  #     * string => REG_SZ
-  #     * array  => REG_MULTI_SZ
-  #     * expand => REG_EXPAND_SZ
-  #     * dword  => REG_DWORD
-  #     * qword  => REG_QWORD
-  #     * binary => REG_BINARY
+class pauby_vagrant_provision::win_console_autologon_enable (
+  String $username = 'vagrant',
+  String $password = 'vagrant'
+) {
 
   registry_value { 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\AutoAdminLogon':
     ensure => present,
@@ -19,13 +12,13 @@ class set_windows_autologon {
   registry_value { 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\DefaultUserName':
     ensure => present,
     type   => string,
-    data   => 'vagrant',
+    data   => $username,
   }
 
   registry_value { 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\DefaultPassword':
     ensure => present,
     type   => string,
-    data   => 'vagrant',
+    data   => $password,
   }
 
   registry_value { 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\AutoAdminLogonCount':
