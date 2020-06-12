@@ -10,26 +10,27 @@ param (
     $DoNotCopyBeforeInstall
 )
 
-# configure WinRM
+# configure WinRM as this is needed for Puppet
 winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}'
 
 # Install Puppet if it's not already installed
 if (-not (Get-Command -Name 'puppet' -ErrorAction SilentlyContinue)) {
-Write-Host "Installing Puppet ..."
+  Write-Host "Installing Puppet ..."
 
-if (Test-Path -Path $PuppetInstallerPath) {
-    if ($DoNotCopyBeforeInstall.IsPresent) {
-        $installerPath = $PuppetInstallerPath
-    }
-    else {
-        # copy the installer BEFORE running it
-        Write-Verbose 'Copying installer to temporary location before executing ...'
-        $installerPath = Join-Path -Path $env:TEMP -ChildPath ("{0}.msi" -f ([GUID]::NewGuid()).Guid)
-        $null = Copy-Item -Path $PuppetInstallerPath -Destination $tempInstallerPath -Force
-    }
+  if (Test-Path -Path $PuppetInstallerPath) {
+      if ($DoNotCopyBeforeInstall.IsPresent) {
+          $installerPath = $PuppetInstallerPath
+      }
+      else {
+          # copy the installer BEFORE running it
+          Write-Verbose 'Copying installer to temporary location before executing ...'
+          $installerPath = Join-Path -Path $env:TEMP -ChildPath ("{0}.msi" -f ([GUID]::NewGuid()).Guid)
+          $null = Copy-Item -Path $PuppetInstallerPath -Destination $installerPath -Force
+      }
 
-    Start-Process -FilePath $installerPath -ArgumentList "/qn", "/norestart", "/l*v pp.log" -Wait
-}
-else {
-    Write-Error "Puppet agent not found at '$puppetPath'. Throwing."
+      Start-Process -FilePath $installerPath -ArgumentList "/qn", "/norestart", "/l*v pp.log" -Wait
+  }
+  else {
+      Write-Error "Puppet agent installer not found at '$puppetPath'. Throwing."
+  }
 }
