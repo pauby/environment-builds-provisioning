@@ -6,7 +6,7 @@ class pauby_vagrant_provision::win_os_provision {
   }
 
   class { 'pauby_vagrant_provision::win_updates':
-    ensure => 'disable',
+    ensure => 'manual',
   }
 
   class { 'pauby_vagrant_provision::win_networking_profile':
