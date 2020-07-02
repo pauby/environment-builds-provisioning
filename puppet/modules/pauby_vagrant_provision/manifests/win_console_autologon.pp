@@ -1,5 +1,5 @@
 class pauby_vagrant_provision::win_console_autologon (
-  Enum['enable', 'disable'] $ensure   = enable,{
+  Enum['enable', 'disable'] $ensure   = enable,
   String                    $username = 'vagrant',
   String                    $password = 'vagrant'
 ) {
