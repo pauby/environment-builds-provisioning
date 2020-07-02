@@ -50,4 +50,5 @@ class pauby_vagrant_provision::win_updates (
       type   => dword,
       data   => 1
     }
+  } #elsif
 }
