@@ -4,4 +4,4 @@ if ([bool](Get-Command -Name 'explorer.exe' -ErrorAction SilentlyContinue)) {
 }
 
 # install in all environments
-choco upgrade 7zip, git -y
+choco upgrade 7zip, git, firefox -y
