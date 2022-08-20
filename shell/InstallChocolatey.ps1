@@ -11,7 +11,11 @@ Param (
 )
 
 # only install Chocolatey if it's not installed
-if (-not (Get-Command -Name 'choco' -ErrorAction  SilentlyContinue) -and -not $Force.IsPresent) {
+# Note that in the newer versions of Chocolatey the install script will stop
+# if it detects files / folders in the default Chocolatey install location.
+# So Chocolatey won't be installed again but all of the configuration below
+# will run.
+if (-not (Get-Command -Name 'choco' -ErrorAction  SilentlyContinue) -or $Force.IsPresent) {
 
     # PowerShell will not set this by default (until maybe .NET 4.6.x). This
     # will typically produce a message for PowerShell v2 (just an info
@@ -24,7 +28,7 @@ if (-not (Get-Command -Name 'choco' -ErrorAction  SilentlyContinue) -and -not $F
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
     }
     catch {
-        Write-Output 'Unable to set PowerShell to use TLS 1.2. This is required for contacting Chocolatey as of 03 FEB 2020. https://chocolatey.org/blog/remove-support-for-old-tls-versions. If you see underlying connection closed or trust errors, you may need to do one or more of the following: (1) upgrade to .NET Framework 4.5+ and PowerShell v3+, (2) Call [System.Net.ServicePointManager]::SecurityProtocol = 3072; in PowerShell prior to attempting installation, (3) specify internal Chocolatey package location (set $env:chocolateyDownloadUrl prior to install or host the package internally), (4) use the Download + PowerShell method of install. See https://chocolatey.org/docs/installation for all install options.'
+        Write-Output 'Unable to set PowerShell to use TLS 1.2. This is required for contacting Chocolatey Community Repository as of 03 FEB 2020. https://chocolatey.org/blog/remove-support-for-old-tls-versions. If you see underlying connection closed or trust errors, you may need to do one or more of the following: (1) upgrade to .NET Framework 4.5+ and PowerShell v3+, (2) Call [System.Net.ServicePointManager]::SecurityProtocol = 3072; in PowerShell prior to attempting installation, (3) specify internal Chocolatey package location (set $env:chocolateyDownloadUrl prior to install or host the package internally), (4) use the Download + PowerShell method of install. See https://chocolatey.org/docs/installation for all install options.'
     }
 
     # From https://chocolatey.org/install
@@ -34,14 +38,15 @@ if (-not (Get-Command -Name 'choco' -ErrorAction  SilentlyContinue) -and -not $F
     & $installScript
 
     #Update-SessionEnvironment
-    choco feature enable --name="'autouninstaller'"
+    choco feature enable --name='autouninstaller'
     # - not recommended for production systems:
-    choco feature enable --name="'allowGlobalConfirmation'"
+    choco feature enable --name='allowGlobalConfirmation'
     # - not recommended for production systems:
-    choco feature enable --name="'logEnvironmentValues'"
-
+    choco feature enable --name='logEnvironmentValues'
+    choco feature enable --name='useRememberedArgumentsForUpgrades'
+    choco feature disable --name='exitOnRebootDetected'
     # Set Configuration
-    choco config set cacheLocation $env:ALLUSERSPROFILE\choco-cache
+    choco config set cacheLocation $env:ALLUSERSPROFILE\chocolatey\choco-cache
     choco config set commandExecutionTimeoutSeconds 14400
     choco feature disable -n=showDownloadProgress
     choco feature disable -n=LogValidationResultsOnWarnings
