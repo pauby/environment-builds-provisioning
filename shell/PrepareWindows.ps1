@@ -48,31 +48,36 @@ Set-Content -Path $profile -Encoding UTF8 -Value "" -Force
 winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}' | Out-Null
 
 # Server Core does not have Explorer.exe
-if ([bool](Get-Command -Name 'explorer.exe'  -ErrorAction SilentlyContinue)) {
+if ([bool](Get-Command -Name 'explorer.exe' -ErrorAction SilentlyContinue)) {
     # Set Explorer Preferences
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'
     $advancedKey = "$key\Advanced"
-    Set-ItemProperty $advancedKey Hidden 1
-    Set-ItemProperty $advancedKey HideFileExt 0
-    Set-ItemProperty $advancedKey ShowSuperHidden 1
+    Set-ItemProperty -Path $advancedKey -Name 'Hidden' -Value 1
+    Set-ItemProperty -Path $advancedKey -Name 'HideFileExt' -Value 0
+    Set-ItemProperty -Path $advancedKey -Name 'ShowSuperHidden' -Value 1
 
     $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $parts = $identity.Name -split "\\"
     $user = @{Domain = $parts[0]; Name = $parts[1]}
 
     try {
-        try { $explorer = Get-Process -Name explorer -ErrorAction stop -IncludeUserName }
-        catch {$global:error.RemoveAt(0)}
-
-        if ($explorer -ne $null) {
-            $explorer | ? { $_.UserName -eq "$($user.Domain)\$($user.Name)"} | Stop-Process -Force -ErrorAction Stop | Out-Null
+        try {
+            $explorer = Get-Process -Name 'explorer' -ErrorAction Stop -IncludeUserName
+        }
+        catch {
+            $global:error.RemoveAt(0)
         }
 
-        Start-Sleep 1
+        if ($null -ne $explorer) {
+            $explorer | Where-Object { $_.UserName -eq "$($user.Domain)\$($user.Name)"} |
+                Stop-Process -Force -ErrorAction Stop | Out-Null
+        }
 
-        if (!(Get-Process -Name explorer -ErrorAction SilentlyContinue)) {
+        Start-Sleep -Seconds 1
+
+        if (!(Get-Process -Name 'explorer' -ErrorAction SilentlyContinue)) {
             $global:error.RemoveAt(0)
-            start-Process -FilePath explorer
+            Start-Process -FilePath explorer
         }
     }
     catch {$global:error.RemoveAt(0)}
@@ -109,7 +114,7 @@ catch {
 }
 
 # Only for Server OS with ServerManager
-if ([bool](get-Command -Name 'servermanager.exe' -ErrorAction SilentlyContinue) -and $osData.ProductType -eq 3) {
+if ([bool](Get-Command -Name 'servermanager.exe' -ErrorAction SilentlyContinue) -and $osData.ProductType -eq 3) {
     Write-Host 'Disabling Server Manager for starting at login.'
     Get-ScheduledTask -TaskName 'ServerManager' | Disable-ScheduledTask | Out-Null
 }

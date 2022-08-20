@@ -1,4 +1,7 @@
-choco upgrade bginfo
+choco upgrade bginfo -y
 
-Copy-Item "c:\assets\bginfo.bgi" 'C:\programdata\chocolatey\lib\bginfo\tools\bginfo.bgi'
-Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name bginfo -Value 'c:\programdata\chocolatey\lib\bginfo\tools\bginfo.exe C:\programdata\chocolatey\lib\bginfo\tools\bginfo.bgi /accepteula /silent /timer:0'
+$src = 'c:\assets\bginfo.bgi'
+$dest = 'C:\programdata\chocolatey\lib\bginfo\tools\bginfo.bgi'
+
+Copy-Item -Path $src -Destination $dest
+Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name bginfo -Value "c:\programdata\chocolatey\lib\bginfo\tools\bginfo.exe $dest /accepteula /silent /timer:0"

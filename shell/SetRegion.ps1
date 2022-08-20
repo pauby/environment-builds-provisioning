@@ -14,7 +14,7 @@ switch ($Region) {
 }
 
 # Set Locale, language etc. 
-& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"Region-$Region.xml`""
+& $env:SystemRoot\System32\control.exe "intl.cpl,,/f:`"c:\assets\Region-$Region.xml`""
 
 # These would be nice but they don't affect the default user account, so are pretty pointless.
 #Set-WinSystemLocale -SystemLocale en-GB
